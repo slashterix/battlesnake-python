@@ -59,6 +59,7 @@ def move():
         if direction == 'right':
             x +=1
 
+	# Avoid walls
         if x < 0 or x >= data['width']:
             directions.remove(direction)
             continue
@@ -66,31 +67,63 @@ def move():
             directions.remove(direction)
             continue
 
-        if grid[x][y] == 'B':
+	# Avoid snake tails
+        if grid[x][y] == 'X':
 	    directions.remove(direction)
             continue
 
+	# Avoid places snakes may move
+	if grid[x][y] == '!':
+            directions.remove(direction)
+            continue
+
     #pprint (data)
-    #pprint (zip(*grid), width=120)
+    pprint (zip(*grid), width=120)
     #pprint (directions)
 
     move = random.choice(directions)
-    #print move
+    print move
     return {
         'move': move,
         'taunt': 'battlesnake-python!'
     }
 
 def init(data):
-    grid = [['E' for col in xrange(data['height'])] for row in xrange(data['width'])]
+    grid = [['.' for col in xrange(data['height'])] for row in xrange(data['width'])]
     for snek in data['snakes']:
-        if snek['id']== data['you']:
+        if snek['id'] == data['you']:
             mysnek = snek
+        else:
+            # Mark off possible sneak moves
+            coord = snek['coords'][0]
+            directions = ['up', 'down', 'left', 'right']
+            for direction in directions:
+                x = coord[0]
+                y = coord[1]
+                if direction == 'up':
+                    y -= 1
+                if direction == 'down':
+                    y += 1
+                if direction == 'left':
+                    x -= 1
+                if direction == 'right':
+                    x +=1
+
+                # Skip out of bounds
+                if x < 0 or x >= data['width']:
+                    continue
+                if y < 0 or y >= data['height']:
+                    continue
+
+                # Set marker for unsafe space
+                grid[x][y]="!"
+
+	# Mark off snake positions
         for coord in snek['coords']:
-            grid[coord[0]][coord[1]] = 'B'
+            grid[coord[0]][coord[1]] = 'X'
 
     for food in data['food']:
-        grid[food[0]][food[1]] = 'F'
+        grid[food[0]][food[1]] = '='
     
     return mysnek, grid
 
