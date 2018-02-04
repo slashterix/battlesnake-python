@@ -38,51 +38,12 @@ def start():
 @bottle.post('/move')
 def move():
     data = bottle.request.json
+    move = False
 
-    # TODO: Do things with data
-    directions = ['up', 'down', 'left', 'right']
 
     mysnek, grid = init(data)
 
     myhead = mysnek['coords'][0]
-
-    # Eliminate completly unsafe directions
-    # Walls, and other snakes
-    for direction in directions[:]:
-        x = myhead[0]
-        y = myhead[1]
-        if direction == 'up':
-            y -= 1
-        if direction == 'down':
-            y += 1
-        if direction == 'left':
-            x -= 1
-        if direction == 'right':
-            x +=1
-
-	# Avoid walls
-        if x < 0 or x >= data['width']:
-            directions.remove(direction)
-            continue
-        if y < 0 or y >= data['height']:
-            directions.remove(direction)
-            continue
-
-	# Avoid snake tails
-        if grid[x][y] == 'X':
-	    directions.remove(direction)
-            continue
-
-	# Avoid places snakes may move
-	if grid[x][y] == '!':
-            directions.remove(direction)
-            continue
-
-    #pprint (data)
-    pprint (zip(*grid), width=120)
-    #pprint (directions)
-
-    move = random.choice(directions)
 
     # Go to food if possible
     path = a_star(mysnek['coords'][0], data['food'][0], grid, mysnek['coords'])
@@ -92,11 +53,73 @@ def move():
     #print path[1]
     #print dirToCoord(mysnek['coords'][0], path[1])
 
+    # If no path to food, fall back to safer moves
+    if not move:
+        directions = ['up', 'down', 'left', 'right']
+        # Eliminate completly unsafe directions
+        # Walls, and other snakes
+        for direction in directions[:]:
+            x = myhead[0]
+            y = myhead[1]
+            if direction == 'up':
+                y -= 1
+            if direction == 'down':
+                y += 1
+            if direction == 'left':
+                x -= 1
+            if direction == 'right':
+                x +=1
+
+            # Avoid walls
+            if x < 0 or x >= data['width']:
+                directions.remove(direction)
+                continue
+            if y < 0 or y >= data['height']:
+                directions.remove(direction)
+                continue
+
+            # Avoid snake tails
+            if grid[x][y] == 'X':
+                directions.remove(direction)
+                continue
+
+        # Check for unfavorable moves
+        if len(directions) > 0:
+            directions2 = directions[:]
+            for direction in directions2[:]:
+                x = myhead[0]
+                y = myhead[1]
+                if direction == 'up':
+                    y -= 1
+                if direction == 'down':
+                    y += 1
+                if direction == 'left':
+                    x -= 1
+                if direction == 'right':
+                    x +=1
+                # Avoid places snakes may move
+                if grid[x][y] == '!':
+                    directions2.remove(direction)
+                    continue
+            if len(directions2) > 0:
+                # Make a random move
+                move = random.choice(directions2)
+            else:
+                print '\033[91m' + "Must move unsafe!" + '\033[0m'
+                # Make a random move
+                move = random.choice(directions)
+        else:
+            # Make a random move
+            move = random.choice(directions)
+
+    #pprint (data)
+    pprint (zip(*grid), width=120)
+    #pprint (directions)
 
     print move
     return {
         'move': move,
-        'taunt': 'battlesnake-python!'
+        'taunt': move
     }
 
 def init(data):
