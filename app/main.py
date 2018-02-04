@@ -102,11 +102,18 @@ def move():
 def init(data):
     # Create empty grid to hold flags
     grid = [['.' for col in xrange(data['height'])] for row in xrange(data['width'])]
+
+    # Mark foods
+    # First so its overwritten by unsafe flags
+    for food in data['food']:
+        grid[food[0]][food[1]] = '='
+
     # Find myself
     for snek in data['snakes']:
         if snek['id'] == data['you']:
             mysnek = snek
             break
+
     # Set flags
     for snek in data['snakes']:
 
@@ -143,8 +150,6 @@ def init(data):
         for coord in snek['coords']:
             grid[coord[0]][coord[1]] = 'X'
 
-    for food in data['food']:
-        grid[food[0]][food[1]] = '='
 
     return mysnek, grid
 
