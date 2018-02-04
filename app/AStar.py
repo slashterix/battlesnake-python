@@ -16,7 +16,7 @@ def reconstruct_path(came_from, current):
         total_path.append(current)
     return list(reversed(total_path))
 
-def neighbours(node, grid, score, tail, ignore_list):
+def neighbours(node, grid, score, tail, safe_list):
     width = len(grid)
     height = len(grid[0])
 
@@ -36,7 +36,7 @@ def neighbours(node, grid, score, tail, ignore_list):
     if (node[1] < height-1):
         result.append((node[0],node[1]+1))
 
-    result = filter(lambda p: (grid[p[0]][p[1]] in [".","="]) or (p in subtail), result)
+    result = filter(lambda p: (grid[p[0]][p[1]] in safe_list) or (p in subtail), result)
 
     return result
 
@@ -54,27 +54,30 @@ def a_star(start, goal, grid, tail):
     f_score = [[10000 for x in xrange(len(grid[y]))] for y in xrange(len(grid))]
     f_score[start[0]][start[1]] = dist(start,goal)
 
-    while(len(open_set) > 0):
-        current = min(open_set, key=lambda p: f_score[p[0]][p[1]])
+    safe_lists = [[".","="],
+		  [".","+","!"]]
+    for safe_list in safe_lists:
+	    while(len(open_set) > 0):
+		current = min(open_set, key=lambda p: f_score[p[0]][p[1]])
 
-        if (current == goal):
-            return reconstruct_path(came_from, goal)
+		if (current == goal):
+		    return reconstruct_path(came_from, goal)
 
-        open_set.remove(current)
-        closed_set.append(current)
+		open_set.remove(current)
+		closed_set.append(current)
 
-        for neighbour in neighbours(current, grid, g_score[current[0]][current[1]], tail,[1,2,5]):
-            if neighbour in closed_set:
-                continue
-            tentative_g_score = g_score[current[0]][current[1]] + dist(current,neighbour)
-            if neighbour not in open_set:
-                open_set.append(neighbour)
-            elif tentative_g_score >= g_score[neighbour[0]][neighbour[1]]:
-                continue
+		for neighbour in neighbours(current, grid, g_score[current[0]][current[1]], tail, safe_list):
+		    if neighbour in closed_set:
+			continue
+		    tentative_g_score = g_score[current[0]][current[1]] + dist(current,neighbour)
+		    if neighbour not in open_set:
+			open_set.append(neighbour)
+		    elif tentative_g_score >= g_score[neighbour[0]][neighbour[1]]:
+			continue
 
-            came_from[neighbour] = current
-            g_score[neighbour[0]][neighbour[1]] = tentative_g_score
-            f_score[neighbour[0]][neighbour[1]] = tentative_g_score + dist(neighbour,goal)
+		    came_from[neighbour] = current
+		    g_score[neighbour[0]][neighbour[1]] = tentative_g_score
+		    f_score[neighbour[0]][neighbour[1]] = tentative_g_score + dist(neighbour,goal)
 
     return None
 
