@@ -53,6 +53,12 @@ def move():
     #print path[1]
     #print dirToCoord(mysnek['coords'][0], path[1])
 
+    # Go to tail
+    if not move:
+        path = a_star(mysnek['coords'][0], mysnek['coords'][-1], grid, mysnek['coords'])
+        if path:
+            move = dirToCoord(mysnek['coords'][0], path[1])
+
     # If no path to food, fall back to safer moves
     if not move:
         directions = ['up', 'down', 'left', 'right']
