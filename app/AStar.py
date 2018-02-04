@@ -36,7 +36,7 @@ def neighbours(node, grid, score, tail, ignore_list):
     if (node[1] < height-1):
         result.append((node[0],node[1]+1))
 
-    result = filter(lambda p: (grid[p[0]][p[1]] not in ignore_list) or (p in subtail), result)
+    result = filter(lambda p: (grid[p[0]][p[1]] in [".","="]) or (p in subtail), result)
 
     return result
 

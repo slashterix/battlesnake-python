@@ -45,7 +45,7 @@ def move():
     mysnek, grid = init(data)
 
     myhead = mysnek['coords'][0]
-    
+
     # Eliminate completly unsafe directions
     # Walls, and other snakes
     for direction in directions[:]:
@@ -83,6 +83,16 @@ def move():
     #pprint (directions)
 
     move = random.choice(directions)
+
+    # Go to food if possible
+    path = a_star(mysnek['coords'][0], data['food'][0], grid, mysnek['coords'])
+    if path:
+        move = dirToCoord(mysnek['coords'][0], path[1])
+    #print mysnek['coords'][0]
+    #print path[1]
+    #print dirToCoord(mysnek['coords'][0], path[1])
+
+
     print move
     return {
         'move': move,
@@ -90,12 +100,18 @@ def move():
     }
 
 def init(data):
+    # Create empty grid to hold flags
     grid = [['.' for col in xrange(data['height'])] for row in xrange(data['width'])]
+    # Find myself
     for snek in data['snakes']:
         if snek['id'] == data['you']:
             mysnek = snek
-        else:
-            # Mark off possible sneak moves
+            break
+    # Set flags
+    for snek in data['snakes']:
+
+        # Mark off possible moves of opponents
+        if snek['id'] != data['you']:
             coord = snek['coords'][0]
             directions = ['up', 'down', 'left', 'right']
             for direction in directions:
@@ -116,8 +132,12 @@ def init(data):
                 if y < 0 or y >= data['height']:
                     continue
 
-                # Set marker for unsafe space
-                grid[x][y]="!"
+                # If snek is smaller, eat it
+                if len(mysnek['coords']) > len(snek['coords']):
+                    grid[x][y]="S"
+                else:
+                    # Set marker for unsafe space
+                    grid[x][y]="!"
 
 	# Mark off snake positions
         for coord in snek['coords']:
@@ -125,8 +145,21 @@ def init(data):
 
     for food in data['food']:
         grid[food[0]][food[1]] = '='
-    
+
     return mysnek, grid
+
+def dirToCoord(from_cell, to_cell):
+    dx = to_cell[0] - from_cell[0]
+    dy = to_cell[1] - from_cell[1]
+
+    if dx == 1:
+        return 'right'
+    elif dx == -1:
+        return 'left'
+    elif dy == -1:
+        return 'up'
+    elif dy == 1:
+        return 'down'
 
 # Expose WSGI app (so gunicorn can find it)
 application = bottle.default_app()
