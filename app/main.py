@@ -174,11 +174,8 @@ def init(data):
                 if y < 0 or y >= data['height']:
                     continue
 
-                # If snek is smaller, eat it
-                if len(mysnek['coords']) > len(snek['coords']):
-                    grid[x][y]="S"
-                else:
-                    # Set marker for unsafe space
+                # If snake is bigger, avoid its possible moves
+                if len(mysnek['coords']) < len(snek['coords']):
                     grid[x][y]="!"
 
         # Mark off snake positions
