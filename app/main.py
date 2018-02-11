@@ -23,8 +23,8 @@ def start():
 
     return {
         #'color': '#%06X' % random.randint(0,256**3-1),
-        'color': '#000000',
-        'secondary_color': '#FFD700',
+        'color': '#0d6818',
+        'secondary_color': '#000000',
         'taunt': '{}'.format(game_id),
         #'head_url': 'https://cn.pling.com/img//hive/content-pre1/104822-1.png',
         'head_url': head_url,
