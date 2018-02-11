@@ -175,7 +175,7 @@ def init(data):
                     continue
 
                 # If snake is bigger, avoid its possible moves
-                if len(mysnek['coords']) < len(snek['coords']):
+                if len(mysnek['coords']) <= len(snek['coords']):
                     grid[x][y]="!"
 
         # Mark off snake positions
