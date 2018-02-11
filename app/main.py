@@ -43,11 +43,12 @@ def move():
     path = False
     len_buffer=0.9
     hunger_buffer=50
+    target="Unknown"
 
     mysnek, grid = init(data)
 
     # Print debug game board
-    pprint (zip(*grid), width=120)
+    #pprint (zip(*grid), width=120)
 
     myhead = mysnek['coords'][0]
     mylen = len(mysnek['coords'])
@@ -59,14 +60,18 @@ def move():
             longest_snake = len(snek['coords'])
 
     # Am I safely in the lead? Go to tail
-    if mylen > (longest_snake*len_buffer) and mysnek['health_points'] > hunger_buffer:
+    print "MyLen {}, longest {}, health {}".format((mylen*len_buffer), longest_snake, mysnek['health_points'])
+    print "Head {},{} -> Tail {},{}".format(mysnek['coords'][0][0],mysnek['coords'][0][1],mysnek['coords'][-1][0],mysnek['coords'][-1][1])
+    if (mylen*len_buffer) > longest_snake and mysnek['health_points'] > hunger_buffer and mysnek['coords'][0] != mysnek['coords'][-1]:
         path = a_star(mysnek['coords'][0], mysnek['coords'][-1], grid, mysnek['coords'])
         # There may be no path to the tail
         if path:
             move = dirToCoord(mysnek['coords'][0], path[1])
+            target="Tail"
 
     # Go to food if possible
     if not move:
+        print "Try finding food"
         for food in data['food']:
             # Is food safe?
             if grid[food[0]][food[1]] != '=':
@@ -81,9 +86,11 @@ def move():
         # Set the move for the path
         if path:
             move = dirToCoord(mysnek['coords'][0], path[1])
+            target="Food"
 
     # If still no paths, fall back to safer moves
     if not move:
+        print "Pick random move"
         directions = ['up', 'down', 'left', 'right']
 
         # Eliminate completely unsafe directions
@@ -134,18 +141,22 @@ def move():
             if len(directions2) > 0:
                 # Make a random move
                 move = random.choice(directions2)
+                target="Random safe move"
             else:
                 # No safe moves, pick a possible head collision and hope for the best
                 move = random.choice(directions)
+                target="Random unsafe move"
         else:
             # Give up and guess at random
             move = random.choice(['up', 'down', 'left', 'right'])
+            target="shrug?"
 
     # Print the move we are making
-    print move
+    print "Moving {}, targeting {}".format(move, target)
 
     return {
-        'move': move
+        'move': move,
+        'taunt': "Moving {}, targeting {}".format(move, target)
     }
 
 def init(data):
