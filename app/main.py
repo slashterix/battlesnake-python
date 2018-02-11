@@ -55,8 +55,8 @@ def move():
 
     # Any longer snakes?
     for snek in data['snakes']:
-        if snek['id'] != data['you'] and len(snek['coords'] > longest_snake:
-            longest_snake = len(snek['coords']
+        if snek['id'] != data['you'] and len(snek['coords']) > longest_snake:
+            longest_snake = len(snek['coords'])
 
     # Am I safely in the lead? Go to tail
     if mylen > (longest_snake*len_buffer) and mysnek['health_points'] > hunger_buffer:
