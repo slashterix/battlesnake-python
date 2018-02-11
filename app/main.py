@@ -41,8 +41,8 @@ def move():
     data = move2018to2017(bottle.request.json)
     move = False
     path = False
-    len_buffer=0.9
-    hunger_buffer=50
+    len_buffer=0.75
+    hunger_buffer=25
     target="Unknown"
 
     mysnek, grid = init(data)
