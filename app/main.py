@@ -75,8 +75,6 @@ def move():
         # Eliminate completely unsafe directions
         # Walls, and other snakes
         for direction in directions[:]:
-            print direction
-            pprint(myhead)
             x = myhead[0]
             y = myhead[1]
             if direction == 'up':
@@ -89,18 +87,15 @@ def move():
                 x +=1
 
             # Avoid walls
-            print "X is ", x, " and width is ", data['width']
             if x < 0 or x >= data['width']:
                 directions.remove(direction)
                 continue
-            print "Y is ", y, " and height is ", data['height']
             if y < 0 or y >= data['height']:
                 directions.remove(direction)
                 continue
 
             # Avoid snake tails
             if grid[x][y] == 'X':
-                print "Tail avoidance"
                 directions.remove(direction)
                 continue
 
