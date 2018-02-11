@@ -41,6 +41,8 @@ def move():
     data = move2018to2017(bottle.request.json)
     move = False
     path = False
+    len_buffer=0.9
+    hunger_buffer=50
 
     mysnek, grid = init(data)
 
@@ -48,23 +50,35 @@ def move():
     pprint (zip(*grid), width=120)
 
     myhead = mysnek['coords'][0]
+    mylen = len(mysnek['coords'])
+    longest_snake = 0
 
-    # Go to food if possible
-    for food in data['food']:
-        # Get path to food item
-        t_path = a_star(mysnek['coords'][0], food, grid, mysnek['coords'])
-        # If path is shorter than previous food path, choose it
-        if not path or t_path and len(path) > len(t_path):
-            path = t_path
+    # Any longer snakes?
+    for snek in data['snakes']:
+        if snek['id'] != data['you'] and len(snek['coords'] > longest_snake:
+            longest_snake = len(snek['coords']
 
-    # Set the move for the path
-    if path:
-        move = dirToCoord(mysnek['coords'][0], path[1])
-
-    # Go to tail if no food move available
-    if not move:
+    # Am I safely in the lead? Go to tail
+    if mylen > (longest_snake*len_buffer) and mysnek['health_points'] > hunger_buffer:
         path = a_star(mysnek['coords'][0], mysnek['coords'][-1], grid, mysnek['coords'])
         # There may be no path to the tail
+        if path:
+            move = dirToCoord(mysnek['coords'][0], path[1])
+
+    # Go to food if possible
+    if not move:
+        for food in data['food']:
+            # Is food safe?
+            if grid[food[0]][food[1]] != '=':
+                print "Unsafe food!"
+                continue
+            # Get path to food item
+            t_path = a_star(mysnek['coords'][0], food, grid, mysnek['coords'])
+            # If path is shorter than previous food path, choose it
+            if not path or t_path and len(path) > len(t_path):
+                path = t_path
+
+        # Set the move for the path
         if path:
             move = dirToCoord(mysnek['coords'][0], path[1])
 
